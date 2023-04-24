@@ -7,7 +7,9 @@ newLine: .asciiz "\n"
 msg2: .asciiz "Wrong input"
 
 .text
-main:
+.globl inputCheck
+
+inputCheck:
     li $v0, 4
     la $a0, prompt1
     syscall
@@ -21,6 +23,10 @@ main:
     bgt $t0, $t2, is_not_letter  
 
     sub $t1, $t0, 48    
+    
+    li $v0, 4           
+    la $a0, newLine     
+    syscall    
 
     li $v0, 4           
     la $a0, prompt2     
@@ -68,5 +74,5 @@ even:
     syscall
 
 exit:
-    li $v0, 10
-    syscall
+	jr $ra
+	

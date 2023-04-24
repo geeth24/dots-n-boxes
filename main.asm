@@ -103,6 +103,9 @@ main:
                 syscall
                 addi $t5, $t5, 1
                 blt $t5, $t3, print_column
+                
+                
+        jal inputCheck        
 
         li $v0, 10
         syscall
