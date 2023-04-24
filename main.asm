@@ -107,7 +107,7 @@ main:
                 
         jal inputCheck
         
-                    # print #s6 and #s7
+     # print #s6 and #s7 from inputCheck
     li $v0, 1
     move $a0, $s6
     syscall
