@@ -105,7 +105,16 @@ main:
                 blt $t5, $t3, print_column
                 
                 
-        jal inputCheck        
+        jal inputCheck
+        
+                    # print #s6 and #s7
+    li $v0, 1
+    move $a0, $s6
+    syscall
+
+    li $v0, 1
+    move $a0, $s7
+    syscall        
 
         li $v0, 10
         syscall

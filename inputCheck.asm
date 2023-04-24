@@ -1,6 +1,6 @@
 .data
-prompt1: .asciiz "Enter the first (lowercase) character: "
-prompt2: .asciiz "Enter the second (lowercase) character: "
+prompt1: .asciiz "Enter the row label: "
+prompt2: .asciiz "Enter the column label:  "
 evenText: .asciiz "Invalid move. Try again."
 oddText: .asciiz "Possible move. Good job!"
 newLine: .asciiz "\n"
@@ -16,7 +16,8 @@ inputCheck:
 
     li $v0, 12          
     syscall             
-    move $t0, $v0     
+    move $t0, $v0
+    move $s6, $t0     
 
     # Check if first charater is after 'o'
     li $t2, 'o'
@@ -34,7 +35,9 @@ inputCheck:
 
     li $v0, 12          
     syscall             
-    move $t0, $v0    
+    move $t0, $v0  
+    move $s7, $t0     
+  
 
     # Check if second character is after 'k'
     li $t2, 'k'
@@ -49,12 +52,14 @@ inputCheck:
 
     li $v0, 4           
     la $a0, newLine     
-    syscall             
-
+    syscall
+                   
     li $v0, 4           
     la $a0, oddText         
     syscall             
-    j exit              
+    j exit
+    
+        
 
 is_not_letter:
     # Print wrong input
@@ -72,7 +77,8 @@ even:
     li $v0, 4
     la $a0, evenText
     syscall
-
+    
 exit:
+    
 	jr $ra
 	
