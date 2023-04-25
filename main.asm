@@ -7,7 +7,8 @@ space: .asciiz " "
 dot: .asciiz "."
 line: .asciiz "|"
 dash: .asciiz "_" 
-
+taken: .asciiz "That space is taken, please try again."
+empty: .asciiz "That space is empty"
 .text
 
 .globl main
@@ -107,14 +108,48 @@ main:
                 
         jal inputCheck
         
-     # print #s6 and #s7 from inputCheck
-    li $v0, 1
-    move $a0, $s6
+     # $s6 subtract ascii of a
+    addi $s6, $s6, -97
+     # multiply by 15
+     mul $s6, $s6, 15
+     # create a offset register $s5 and add it to $s6
+     addi $s5, $s6, 0
+        
+
+     # $s7 subtract ascii of a
+    addi $s7, $s7, -97
+     # add $s7 to $s5 and store in $s5
+        add $s5, $s5, $s7
+
+        # print $s5
+        li $v0, 11
+        move $a0, $s5
+        syscall
+
+     # Load the address of board ($s0), add the offset tho the address.
+    add $s0, $s0, $s5
+
+
+    # if the space in the data is equal to the character in the data then print empty else print taken
+    lb $t9, 0($s0)
+    beq $t9, $s2, print_empty
+    beq $t9, $s3, print_taken
+
+    print_empty:
+    li $v0, 4
+    la $a0, empty
+    syscall  
+    j end # jump to the end label to skip over the print_taken code
+
+    print_taken:
+    li $v0, 4
+    la $a0, taken
     syscall
 
-    li $v0, 1
-    move $a0, $s7
-    syscall        
+    end:
+    li $v0, 10
+    syscall   
+
 
         li $v0, 10
         syscall
