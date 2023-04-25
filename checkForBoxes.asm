@@ -16,8 +16,8 @@ cols: .word 15            # number of columns
 
 # Code segment
 .text
-.globl main
-main:
+.globl checkForBoxes
+checkForBoxes:
     # Load the number of rows and columns into registers
     lw $t0, rows
     lw $t1, cols
