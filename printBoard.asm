@@ -1,6 +1,7 @@
 .data
 space: .asciiz " "
 newline: .asciiz "\n" # newline character for printing
+rowLabel: .asciiz "  abcdefghijklmno"
 
 .text 
 .globl printBoard
@@ -12,7 +13,14 @@ printBoard:
     	addi $t0, $s0, 0
     	addi $t7, $s1, 0
     	li $t3, 11
+    	li $v0, 4 # printing the row label at the top of the board
+    	la $a0, rowLabel
+    	syscall
+    	li $v0, 4
+    	la $a0, newline
+    	syscall
 	print_board:
+		
         	print_column:
             		li $t4, 0
             		lb $t8, 0($t7)
@@ -22,7 +30,7 @@ printBoard:
             		li $v0, 4
             		la $a0, space
             		syscall
-           		 addi $t7, $t7, 1
+           		 	addi $t7, $t7, 1
 
         	print_row:
             		lb $t6, 0($t0)

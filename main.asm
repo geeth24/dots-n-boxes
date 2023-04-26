@@ -1,6 +1,5 @@
 .data
 newline: .asciiz "\n" # newline character for printing
-rowLabel: .asciiz "  abcdefghijklmno"
 columnLabel: .byte 'a','b','c','d','e','f','g','h','i','j','k'
 board: .space 400
 space: .asciiz " "
@@ -14,12 +13,7 @@ empty: .asciiz "That space is empty"
 .globl main
 
 main:
-    li $v0, 4 # printing the row label at the top of the board
-    la $a0, rowLabel
-    syscall
-    li $v0, 4
-    la $a0, newline
-    syscall
+
     la $s0, board # $s0 will permanently hold the initial address of the board
     la $s1, columnLabel # $s1 will permanently hold the initial address of the column label
     lb $s2, space
@@ -59,44 +53,7 @@ main:
             
         jal printBoard # subroutine to print the board                        
         jal inputCheck # subroutine to check the user's input
-        
-     # $s6 subtract ascii of a
-    addi $s6, $s6, -97
-     # multiply by 15
-     mul $s6, $s6, 15
-     # create a offset register $s5 and add it to $s6
-     addi $s5, $s6, 0
-        
-
-     # $s7 subtract ascii of a
-    addi $s7, $s7, -97
-     # add $s7 to $s5 and store in $s5
-        add $s5, $s5, $s7
-
-        # print $s5
-        li $v0, 11
-        move $a0, $s5
-        syscall
-
-     # Load the address of board ($s0), add the offset tho the address.
-    add $s0, $s0, $s5
-
-
-    # if the space in the data is equal to the character in the data then print empty else print taken
-    lb $t9, 0($s0)
-    beq $t9, $s2, print_empty
-    beq $t9, $s3, print_taken
-
-    print_empty:
-    li $v0, 4
-    la $a0, empty
-    syscall  
-    j end # jump to the end label to skip over the print_taken code
-
-    print_taken:
-    li $v0, 4
-    la $a0, taken
-    syscall
+	    jal printBoard
 
     end:
     li $v0, 10
