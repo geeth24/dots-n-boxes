@@ -54,6 +54,16 @@ main:
         jal printBoard # subroutine to print the board                        
         jal inputCheck # subroutine to check the user's input
 	    jal printBoard
+                jal inputCheck # subroutine to check the user's input
+	    jal printBoard
+                jal inputCheck # subroutine to check the user's input
+	    jal printBoard
+                jal inputCheck # subroutine to check the user's input
+	    jal printBoard
+                jal inputCheck # subroutine to check the user's input
+	    jal printBoard
+                jal inputCheck # subroutine to check the user's input
+	    jal printBoard
 
     end:
     li $v0, 10

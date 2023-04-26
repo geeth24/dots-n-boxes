@@ -87,8 +87,8 @@ even:
     checkSpace:
   	# $s6 subtract ascii of a
     	addi $s6, $s6, -97
-     	# multiply by 15
-     	mul $s6, $s6, 15
+     	# multiply by 16
+     	mul $s6, $s6, 16
      	# create a offset register $s5 and add it to $s6
      	addi $s5, $s6, 0
         
@@ -118,14 +118,15 @@ even:
 			li $t7, 2
 			div $t5, $t8
 			mfhi $t9
-			beqz $t9, insert_line
-				insert_dash:
-					sb $s4, 0($s5)
-					j exit
-		
+			beqz $t9, insert_dash
 				insert_line:
 					sb $t6, 0($s5)
 					j exit
+
+				insert_dash:
+					sb $s4, 0($s5)
+					j exit
+
 
 
     	print_taken:
