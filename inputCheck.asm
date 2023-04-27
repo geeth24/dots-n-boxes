@@ -8,6 +8,7 @@ msg2: .asciiz "\nWrong input"
 taken: .asciiz "That space is taken, please try again.\n"
 empty: .asciiz " That space is empty\n"
 line: .asciiz "|"
+value: .asciiz "Value of row label is: "
 
 .text
 .globl inputCheck
@@ -23,7 +24,7 @@ inputCheck:
     move $s6, $t0     
     move $t5, $t0
 
-    # Check if first charater is after 'o'
+    # Check if first charater is after 'k'
     li $t2, 'k'
     bgt $t0, $t2, is_not_letter  
 
@@ -43,7 +44,7 @@ inputCheck:
     move $s7, $t0     
   
 
-    # Check if second character is after 'k'
+    # Check if second character is after 'o'
     li $t2, 'o'
     bgt $t0, $t2, is_not_letter   
 
@@ -70,8 +71,7 @@ is_not_letter:
     li $v0, 4 # system call for print string
     la $a0, msg2 # load the message string address
     syscall
-
-    j exit
+    j inputCheck
 
 even:
     li $v0, 4
@@ -82,7 +82,7 @@ even:
     la $a0, evenText
     syscall
     
-    j exit
+    j inputCheck
     
     checkSpace:
   	# $s6 subtract ascii of a
@@ -107,7 +107,7 @@ even:
     	# if the space in the data is equal to the character in the data then print empty else print taken
     	lb $t9, 0($s5)
     	beq $t9, $s2, print_empty
-    	beq $t9, $s3, print_taken
+    	bne $t9, $s2, print_taken
 
     	print_empty:
     		li $v0, 4
@@ -115,25 +115,27 @@ even:
     		syscall  
     		modifyBoard:
 			lb $t6, line
+			andi $t5, $t5, 0x0F
 			li $t7, 2
-			div $t5, $t8
+			div $t5, $t7
 			mfhi $t9
-			beqz $t9, insert_dash
+			beqz $t9, insert_line
+				insert_dash:
+					sb $s4, 0($s5)
+					j exit
 				insert_line:
 					sb $t6, 0($s5)
 					j exit
 
-				insert_dash:
-					sb $s4, 0($s5)
-					j exit
+				
 
 
 
     	print_taken:
-    	li $v0, 4
-    	la $a0, taken
-    	syscall
-    
+    		li $v0, 4
+    		la $a0, taken
+    		syscall
+        	j inputCheck
 	exit:
 		jr $ra
 	
