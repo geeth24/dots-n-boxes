@@ -1,184 +1,114 @@
 # Data segment
 .data
-array: .word 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-       .word 0,1,0,1,0,1,0,1,0,1,0,1,0,1,0
-       .word 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-       .word 0,1,0,1,0,1,0,1,0,1,0,1,0,1,0
-       .word 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-       .word 0,1,0,1,0,1,0,1,0,1,0,1,0,1,0
-       .word 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-       .word 0,1,0,1,0,1,0,1,0,1,0,1,0,1,0
-       .word 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-       .word 0,1,0,1,0,1,0,1,0,1,0,1,0,1,0
-       .word 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-rows: .word 11            # number of rows
-cols: .word 15            # number of columns
+
+test: .asciiz "this runs"
+input: .asciiz "input: "
+reward: .asciiz "point awarded"
+space: .asciiz " "
 
 # Code segment
-.text
+.text # add number variable to determine if line is horizontal or vertical. If number even, then it is vertical. Otherwise, it is horizontal.
 .globl checkForBoxes
 checkForBoxes:
-    # Load the number of rows and columns into registers
-    lw $t0, rows
-    lw $t1, cols
-    
-    # Initialize the outer loop index (i) to 1
-    li $t2, 1
-    
-    # Loop over the rows of the array
+
+addi $t0, $s0, 0 # load the base address of the board into $t0
+li $t1, 0  # initialize the iterator to 0
+addi $t0, $t0, 1 # increment $t0 to point to the first top line in the fist box
+addi $t1, $t1, 1 # increment the overall iterator to 1
+li $t2, 0  # initialize row to 0
+li $t3, 0  # initialize column to 0
+
+find_box_of_input:
+li $v0, 4
+la $a0, input
+syscall
+
+li $v0, 5
+syscall
+
+move $t4, $v0
+
 outer_loop:
-    # Initialize the inner loop index (j) to 1
-    li $t3, 1
     
-    # Loop over the columns of the current row
-inner_loop:
-    
-    li $t7, 0 # Counter
-    j check_left
-    
-return_left: 
-    
-    j check_right
+   addi $t2, $t2, 1
+   bge $t2, 6, failure 
 
-return_right:
-    
-    j check_up
-    
-return_up:
+inner_loop: 
 
-    j check_down
+    beq $t4, $t1, check_found_box # Check top line of box
+    addi $t5, $t1, 14
+
+    beq $t4, $t5, check_found_box # Check left line of box
+    addi $t5, $t1, 16
+
+    beq $t4, $t5, check_found_box # Check right line of box
+    addi $t5, $t1, 30
     
-return_down:
+    beq $t4, $t5, check_found_box # check bottom line of box
     
-    beq $t7, 3, success # If counter = 3, then a potential box has been found.
+    addi $t3, $t3, 1 # Increment column by 1
+    addi $t0, $t0, 2 # increment $t0 to point to the next top line in the next box
+    addi $t1, $t1, 2 # increment the overall iterator to 2
+    blt $t3, 7, inner_loop
+    li $t3, 1  # initialize column to 0
+    addi $t0, $t0, 18 # increment $t0 to point to the first top line in the fist box
+    addi $t1, $t1, 18 # increment the overall iterator to 2
     
-    # Increment the inner loop index (j) and check if we're done with this row
-    addi $t3, $t3, 2   # increment j
-    blt $t3, $t1, inner_loop # branch to inner_loop if j != cols
+    j outer_loop
     
-    # Increment the outer loop index (i) and check if we're done with the array
-    addi $t2, $t2, 2   # increment i
-    blt $t2, $t0, outer_loop # branch to outer_loop if i != rows
+check_found_box:
+
+    li $t6, 0 # Initialize counter for determining full square
+    
+    add $t7, $s0, 0
+    add $t7, $t7, $t1
+    lb $t5, ($t7)
+
+    beq $t5, 32, top_empty # Check if top line of box is blank
+    addi $t6, $t6, 1
+    
+top_empty:
+    
+    add $t7, $s0, 0
+    add $t7, $t7, $t1
+    addi $t7, $t7, 14
+    lb $t5, ($t7)
+
+    beq $t5, 32, left_empty # Check if left line of box is blank
+    addi $t6, $t6, 1
+    
+left_empty:
+    
+    add $t7, $s0, 0
+    add $t7, $t7, $t1
+    addi $t7, $t7, 16
+    lb $t5, ($t7)
+    
+    beq $t5, 32, right_empty # Check if right line of box is blank
+    addi $t6, $t6, 1
+    
+right_empty:
+
+    add $t7, $s0, 0
+    add $t7, $t7, $t1
+    addi $t7, $t7, 30
+    lb $t5, ($t7)
+    
+    beq $t5, 32, down_empty # Check if left line of box is blank
+    addi $t6, $t6, 1
+
+down_empty:
+
+    beq $t6, 3 success # Checks if the inputs placement will make a box
     j failure
-    
+
 success:
-    move $a0, $t8 #Print row
-    li $v0, 1
-    syscall
     
-    move $a0, $t9 #Print column
+    li $v0, 4
+    la $a0, reward
     syscall
  
 failure:   
-    # Exit the program
-    li $v0, 10 # syscall code for exit
-    syscall
-
-check_left:
-	move $t6, $t3
-	subi $t6, $t6, 1
-	
-	# Calculate the offset into the array
-    	mult $t2, $t1      # multiply i by the number of columns
-    	mflo $t4           # store the result in $t4
-    	add $t4, $t4, $t6  # add j to the offset
-    	sll $t4, $t4, 2    # multiply the offset by 4 (since each word is 4 bytes)
-    	la $t5, array      # load the base address of the array
-    	add $t5, $t5, $t4  # add the offset to the base address to get the address of the current element
+    # Return to main
+    jr $ra
     	
-    	lw $a0, ($t5)
-    	beq $a0, 0, check_left_zero # checks if left line is empty.
-    	j check_left_one
-    	
-check_left_zero:
-	move $t8, $t2 # store row
-	move $t9, $t6 # store column
-	j return_left
-
-check_left_one:
-	addi $t7, $t7, 1 # increment counter by 1
-    	j return_left
-    	
-    	
-check_right:
-	move $t6, $t3
-	addi $t6, $t6, 1
-	
-	# Calculate the offset into the array
-    	mult $t2, $t1      # multiply i by the number of columns
-    	mflo $t4           # store the result in $t4
-    	add $t4, $t4, $t6  # add j to the offset
-    	sll $t4, $t4, 2    # multiply the offset by 4 (since each word is 4 bytes)
-    	la $t5, array      # load the base address of the array
-    	add $t5, $t5, $t4  # add the offset to the base address to get the address of the current element
-    	
-    	lw $a0, ($t5)
-    	beq $a0, 0, check_right_zero # checks if right line is empty.
-    	j check_right_one
-    	
-check_right_zero:
-	move $t8, $t2 # store row
-	move $t9, $t6 # store column
-	j return_right
-
-check_right_one:
-	addi $t7, $t7, 1 # increment counter by 1
-    	j return_right
-
-    	
-check_up:
-       move $t6, $t2
-       subi $t6, $t6, 1
-       
-       mult $t6, $t1      # multiply i by the number of columns
-       mflo $t4           # store the result in $t4
-       add $t4, $t4, $t3  # add j to the offset
-       sll $t4, $t4, 2    # multiply the offset by 4 (since each word is 4 bytes)
-       la $t5, array      # load the base address of the array
-       add $t5, $t5, $t4  # add the offset to the base address to get the address of the current element
-
-       lw $a0, ($t5)
-       beq $a0, 0, check_up_zero # checks if top line is empty.
-       j check_up_one
-    	
-check_up_zero:
-        move $t8, $t6 # store row
-	move $t9, $t3 # store column
-
-	j return_up
-
-check_up_one:
-	addi $t7, $t7, 1 # increment counter by 1
-    	j return_up
-	
-check_down:
-       move $t6, $t2
-       addi $t6, $t6, 1
-       
-       mult $t6, $t1      # multiply i by the number of columns
-       mflo $t4           # store the result in $t4
-       add $t4, $t4, $t3  # add j to the offset
-       sll $t4, $t4, 2    # multiply the offset by 4 (since each word is 4 bytes)
-       la $t5, array      # load the base address of the array
-       add $t5, $t5, $t4  # add the offset to the base address to get the address of the current element
-
-	lw $a0, ($t5)
-        beq $a0, 0, check_down_zero # checks if bottom line is empty.
-    	j check_down_one
-    	
-check_down_zero:
-	move $t8, $t6 # store row
-	move $t9, $t3 # store column
-	j return_down
-
-check_down_one:
-	addi $t7, $t7, 1 # increment counter by 1
-    	j return_down
-    	
-    # Calculate the offset into the array
-    # mult $t2, $t1      # multiply i by the number of columns
-    # mflo $t4           # store the result in $t4
-    # add $t4, $t4, $t3  # add j to the offset
-    # sll $t4, $t4, 2    # multiply the offset by 4 (since each word is 4 bytes)
-    # la $t5, array      # load the base address of the array
-    # add $t5, $t5, $t4  # add the offset to the base address to get the address of the current element
