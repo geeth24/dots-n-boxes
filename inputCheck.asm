@@ -9,7 +9,7 @@ taken: .asciiz "That space is taken, please try again.\n"
 empty: .asciiz " That space is empty\n"
 line: .asciiz "|"
 value: .asciiz "Value of row label is: "
-
+dash: .asciiz "_" 
 .text
 .globl inputCheck
 
@@ -120,8 +120,9 @@ even:
 			div $t5, $t7
 			mfhi $t9
 			beqz $t9, insert_line
+			lb $t7, dash
 				insert_dash:
-					sb $s4, 0($s5)
+					sb $t7, 0($s5)
 					j exit
 				insert_line:
 					sb $t6, 0($s5)

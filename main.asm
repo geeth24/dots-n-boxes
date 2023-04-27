@@ -9,6 +9,7 @@ dash: .asciiz "_"
 taken: .asciiz "That space is taken, please try again."
 empty: .asciiz "That space is empty"
 
+
 .text
 
 .globl main
@@ -51,7 +52,9 @@ main:
                 addi $t5, $t5, 1
                 li $t6, 1 # resetting the binary value to insert row of spaces next
                 blt $t5, $t3, init_column # branch if the 8x6 matrix is not complete yet
-            
+        
+        li $s3, 0 # $s3 will be reserved for the user's score
+        li $s4, 0 # $s4 will be reserved for the computer's score
         jal printBoard # subroutine to print the board                        
 	jal inputCheck
 	jal printBoard

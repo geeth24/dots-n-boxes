@@ -2,11 +2,31 @@
 space: .asciiz " "
 newline: .asciiz "\n" # newline character for printing
 rowLabel: .asciiz "  ab cd ef gh ij kl mn o"
+userScore: .asciiz "The user's score is: "
+computerScore: .asciiz "The computer's score is: "
 .text 
 .globl printBoard
 
 
 printBoard:
+	li $v0, 4
+	la $a0, userScore
+	syscall
+	li $v0, 1
+	move $a0, $s3
+	syscall
+	li $v0, 4
+	la $a0, newline
+	syscall
+	li $v0, 4
+	la $a0, computerScore
+	syscall
+	li $v0, 1
+	move $a0, $s4
+	syscall
+	li $v0, 4
+	la $a0, newline
+	syscall
     	addi $t0, $s0, 0
     	addi $t7, $s1, 0
     	li $v0, 4 # printing the row label at the top of the board
