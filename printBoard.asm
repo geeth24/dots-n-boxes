@@ -1,27 +1,26 @@
 .data
 space: .asciiz " "
 newline: .asciiz "\n" # newline character for printing
-rowLabel: .asciiz "  abcdefghijklmno"
-
+rowLabel: .asciiz "  ab cd ef gh ij kl mn o"
 .text 
 .globl printBoard
 
 
 printBoard:
-	li $t2, 8 # number of columns
-	li $t5, 0
     	addi $t0, $s0, 0
     	addi $t7, $s1, 0
-    	li $t3, 11
     	li $v0, 4 # printing the row label at the top of the board
     	la $a0, rowLabel
     	syscall
     	li $v0, 4
     	la $a0, newline
     	syscall
+    	li $t1, 0
+    	li $t2, 0
+    	li $t3, 15
+    	li $t5, 11
 	print_board:
-		
-        	print_column:
+        	print_row:
             		li $t4, 0
             		lb $t8, 0($t7)
             		li $v0, 11
@@ -30,35 +29,23 @@ printBoard:
             		li $v0, 4
             		la $a0, space
             		syscall
-           		 	addi $t7, $t7, 1
-
-        	print_row:
-            		lb $t6, 0($t0)
-            		li $v0, 11
-            		move $a0, $t6
-            		syscall
-            		addi $t0, $t0, 1
-            		beq $t2, $t4, end_row
-            		addi $t4, $t4, 1
-            		
-            		            
-            		lb $t6, 0($t0)
-            		li $v0, 11
-            		move $a0, $t6
-            		syscall
-            		addi $t0, $t0, 1
-            
-            		li $v0, 4
+           		addi $t7, $t7, 1
+           	print_columns:
+           		lb $t6, 0($t0)
+           		li $v0, 11
+           		move $a0, $t6
+           		syscall
+           		li $v0, 4
             		la $a0, space
             		syscall
-            
-            
-            		blt $t4, $t2, print_row
-            		end_row:
-                		li $v0, 4
-                		la $a0, newline
-                		syscall
-                		addi $t5, $t5, 1
-                		blt $t5, $t3, print_column
-            		
+           		addi $t0, $t0, 1
+           		addi $t4, $t4, 1
+           		blt $t4, $t3, print_columns
+           	last_column:
+           		addi $t2, $t2, 1
+           		li $v0, 4
+           		la $a0, newline
+           		syscall
+           		blt $t2, $t5, print_row
+
            jr $ra

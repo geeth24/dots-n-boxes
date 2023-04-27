@@ -8,6 +8,7 @@ line: .asciiz "|"
 dash: .asciiz "_" 
 taken: .asciiz "That space is taken, please try again."
 empty: .asciiz "That space is empty"
+
 .text
 
 .globl main
@@ -25,7 +26,7 @@ main:
     li $t3, 6 # number of rows
     li $t5, 0 # current row
     li $t6, 0 # binary value used to determine whether current row contains only spaces or dots and spaces
-    li $t7, 16 # total number of rows including both dotted rows and rows of spaces
+    li $t7, 15 # total number of rows including both dotted rows and rows of spaces
 
     default_board:
         init_column:
@@ -39,10 +40,10 @@ main:
                 li $t6, 0 # resetting the binary value to insert row of dots and spaces next
                 j init_column	
             init_row: # initializing a row of dots and spaces
-                sb $s3, 0($t0)
-                addi $t0, $t0, 1
-                beq $t4, $t2, last_column # not inserting an extra space when the last column is reached
+                sb $s3, 0($t0) # store dot into the array
+                addi $t0, $t0, 1 # increment the address
                 addi $t4, $t4, 1
+                beq $t4, $t2, last_column # not inserting an extra space when the last column is reached
                 sb $s2, 0($t0)
                 addi $t0, $t0, 1
                 blt $t4, $t2, init_row
@@ -52,18 +53,9 @@ main:
                 blt $t5, $t3, init_column # branch if the 8x6 matrix is not complete yet
             
         jal printBoard # subroutine to print the board                        
-        jal inputCheck # subroutine to check the user's input
-	    jal printBoard
-                jal inputCheck # subroutine to check the user's input
-	    jal printBoard
-                jal inputCheck # subroutine to check the user's input
-	    jal printBoard
-                jal inputCheck # subroutine to check the user's input
-	    jal printBoard
-                jal inputCheck # subroutine to check the user's input
-	    jal printBoard
-                jal inputCheck # subroutine to check the user's input
-	    jal printBoard
+	jal inputCheck
+	jal printBoard
+
 
     end:
     li $v0, 10

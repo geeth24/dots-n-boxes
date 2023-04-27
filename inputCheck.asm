@@ -88,7 +88,7 @@ even:
   	# $s6 subtract ascii of a
     	addi $s6, $s6, -97
      	# multiply by 16
-     	mul $s6, $s6, 16
+     	mul $s6, $s6, 15
      	# create a offset register $s5 and add it to $s6
      	addi $s5, $s6, 0
         
