@@ -2,16 +2,16 @@
 prompt1: .asciiz "Enter the row label: "
 prompt2: .asciiz "Enter the column label:  "
 evenText: .asciiz "Invalid move. Try again.\n"
-oddText: .asciiz ""
+oddText: .asciiz "Possible move. Good job!"
 newLine: .asciiz "\n"
 msg2: .asciiz "\nWrong input\n"
 taken: .asciiz "That space is taken, please try again.\n"
-empty: .asciiz " "
+empty: .asciiz " That space is empty\n"
 line: .asciiz "|"
-value: .asciiz " "
+value: .asciiz "Value of row label is: "
 dash: .asciiz "_"
 space: .asciiz " "
-reward: .asciiz ""
+reward: .asciiz "point awarded"
 
 .text
 .globl inputCheck
@@ -125,12 +125,15 @@ even:
 			lb $t7, dash
 				insert_dash:
 					sb $t7, 0($s5)
-
 					j checkForBoxes
 
 				insert_line:
 					sb $t6, 0($s5)
 					j checkForBoxes
+
+
+				
+
 
 
     	print_taken:
@@ -164,12 +167,9 @@ even:
 				beq $t4, $t6, start_dash
 				j _line
 		insertDash: sb $t1, 0($t5)
-                   li $t8, 0
-				   j checkForBoxes
+				   j end
 		insertLine: sb $t2, 0($t5)
-                   li $t8, 0
-                   j checkForBoxes
-		exit:	jr $ra
+		end:	jr $ra
 		
 
 
@@ -269,12 +269,6 @@ success:
     li $v0, 4
     la $a0, reward
     syscall
-    beq $t8, $zero, updateComputer
-    addi $s3, $s3, 1
-    j exit
-    updateComputer:
-    	addi $s4, $s4, 1
-    	j exit
  
 failure:   
     # Return to main
