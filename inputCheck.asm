@@ -2,16 +2,16 @@
 prompt1: .asciiz "Enter the row label: "
 prompt2: .asciiz "Enter the column label:  "
 evenText: .asciiz "Invalid move. Try again.\n"
-oddText: .asciiz "Possible move. Good job!"
+oddText: .asciiz ""
 newLine: .asciiz "\n"
-msg2: .asciiz "\nWrong input"
+msg2: .asciiz "\nWrong input\n"
 taken: .asciiz "That space is taken, please try again.\n"
-empty: .asciiz " That space is empty\n"
+empty: .asciiz " "
 line: .asciiz "|"
-value: .asciiz "Value of row label is: "
+value: .asciiz " "
 dash: .asciiz "_"
-
-reward: .asciiz "point awarded"
+space: .asciiz " "
+reward: .asciiz ""
 
 .text
 .globl inputCheck
@@ -125,15 +125,12 @@ even:
 			lb $t7, dash
 				insert_dash:
 					sb $t7, 0($s5)
+
 					j checkForBoxes
 
 				insert_line:
 					sb $t6, 0($s5)
 					j checkForBoxes
-
-
-				
-
 
 
     	print_taken:
@@ -142,7 +139,37 @@ even:
     		syscall
         	j inputCheck
 	exit:
-		jr $ra
+		lb $t0, space
+		lb $t1, dash
+		lb $t2, line
+		addi $t5, $s0, -1
+		li $t7, 6
+		li $t6, 7
+		start_dash:
+			li $t4, 0
+			_dash:
+				addi $t5, $t5, 2
+				lb $t3, 0($t5)
+				beq $t3, $t0, insertDash
+				addi $t4, $t4, 1
+				beq $t4, $t7, start_line
+				j _dash
+		start_line:
+			li $t4, 0
+			_line:
+				addi $t5, $t5, 2
+				lb $t3, 0($t5)
+				beq $t3, $t0, insertLine
+				addi $t4, $t4, 1
+				beq $t4, $t6, start_dash
+				j _line
+		insertDash: sb $t1, 0($t5)
+                   li $t8, 0
+				   j checkForBoxes
+		insertLine: sb $t2, 0($t5)
+                   li $t8, 0
+                   j checkForBoxes
+		exit:	jr $ra
 		
 
 
@@ -166,24 +193,21 @@ find_box_of_input:
 outer_loop:
     
    addi $t2, $t2, 1
-   bge $t2, 6, exit
+   bge $t2, 6, failure 
 
 inner_loop: 
 
     beq $t4, $t1, check_found_box # Check top line of box
-    
-    # Check left line of box
     addi $t5, $t1, 14
-    beq $t4, $t5, check_found_box
-    
-    # Check right line of box
+
+    beq $t4, $t5, check_found_box # Check left line of box
     addi $t5, $t1, 16
-    beq $t4, $t5, check_found_box
-    
-    # check bottom line of box
+
+    beq $t4, $t5, check_found_box # Check right line of box
     addi $t5, $t1, 30
-    beq $t4, $t5, check_found_box
- failed:   
+    
+    beq $t4, $t5, check_found_box # check bottom line of box
+    
     addi $t3, $t3, 1 # Increment column by 1
     addi $t0, $t0, 2 # increment $t0 to point to the next top line in the next box
     addi $t1, $t1, 2 # increment the overall iterator to 2
@@ -221,7 +245,7 @@ left_empty:
     add $t7, $t7, $t1
     addi $t7, $t7, 16
     lb $t5, ($t7)
-
+    
     beq $t5, 32, right_empty # Check if right line of box is blank
     addi $t6, $t6, 1
     
@@ -231,21 +255,28 @@ right_empty:
     add $t7, $t7, $t1
     addi $t7, $t7, 30
     lb $t5, ($t7)
- 
+    
     beq $t5, 32, down_empty # Check if left line of box is blank
     addi $t6, $t6, 1
 
 down_empty:
-    bge $t6, 4 success # Checks if the inputs placement will make a box
+
+    beq $t6, 3 success # Checks if the inputs placement will make a box
     j failure
 
 success:
+    
     li $v0, 4
     la $a0, reward
     syscall
+    beq $t8, $zero, updateComputer
+    addi $s3, $s3, 1
     j exit
+    updateComputer:
+    	addi $s4, $s4, 1
+    	j exit
  
 failure:   
     # Return to main
-    j failed # go back to inner loop
+    j exit
 	
