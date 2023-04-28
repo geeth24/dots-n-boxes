@@ -58,7 +58,21 @@ main:
         jal printBoard # subroutine to print the board                        
 	jal inputCheck
 	jal printBoard
-
+	jal inputCheck
+	jal printBoard
+    jal inputCheck
+	jal printBoard
+    jal inputCheck
+	jal printBoard
+    jal inputCheck
+	jal printBoard
+    jal inputCheck
+	jal printBoard
+    jal inputCheck
+	jal printBoard
+    jal inputCheck
+	jal printBoard
+    
 
     end:
     li $v0, 10
