@@ -2,16 +2,12 @@
 prompt1: .asciiz "Enter the row label: "
 prompt2: .asciiz "Enter the column label:  "
 evenText: .asciiz "Invalid move. Try again.\n"
-oddText: .asciiz "Possible move. Good job!"
 newLine: .asciiz "\n"
 msg2: .asciiz "\nWrong input\n"
 taken: .asciiz "That space is taken, please try again.\n"
-empty: .asciiz " That space is empty\n"
 line: .asciiz "|"
-value: .asciiz "Value of row label is: "
 dash: .asciiz "_"
 space: .asciiz " "
-reward: .asciiz "point awarded"
 
 .text
 .globl inputCheck
@@ -62,9 +58,7 @@ inputCheck:
     la $a0, newLine     
     syscall
                    
-    li $v0, 4           
-    la $a0, oddText         
-    syscall             
+          
     j checkSpace
     
         
@@ -100,9 +94,7 @@ even:
     	addi $s7, $s7, -97
      	# add $s7 to $s5 and store in $s5
         add $s5, $s5, $s7
-	li $v0, 1
-	move $a0, $s5
-	syscall
+
      	# Load the address of board ($s0), add the offset tho the address.
     	add $s5, $s0, $s5
 
@@ -112,9 +104,6 @@ even:
     	bne $t9, $s2, print_taken
 
     	print_empty:
-    		li $v0, 4
-    		la $a0, empty
-    		syscall 
     		modifyBoard:
 			lb $t6, line
 			andi $t5, $t5, 0x0F
@@ -269,9 +258,7 @@ down_empty:
 success:
     # problem here
     #addi $s3, $s3, 1
-    li $v0, 4
-    la $a0, reward
-    syscall
+    addi $s3, $s3, 1
     j exit
  
 failure:   
