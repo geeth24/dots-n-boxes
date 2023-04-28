@@ -193,21 +193,24 @@ find_box_of_input:
 outer_loop:
     
    addi $t2, $t2, 1
-   bge $t2, 6, failure 
+   bge $t2, 6, exit
 
 inner_loop: 
 
     beq $t4, $t1, check_found_box # Check top line of box
+    
+    # Check left line of box
     addi $t5, $t1, 14
-
-    beq $t4, $t5, check_found_box # Check left line of box
+    beq $t4, $t5, check_found_box
+    
+    # Check right line of box
     addi $t5, $t1, 16
-
-    beq $t4, $t5, check_found_box # Check right line of box
+    beq $t4, $t5, check_found_box
+    
+    # check bottom line of box
     addi $t5, $t1, 30
-    
-    beq $t4, $t5, check_found_box # check bottom line of box
-    
+    beq $t4, $t5, check_found_box
+ failed:   
     addi $t3, $t3, 1 # Increment column by 1
     addi $t0, $t0, 2 # increment $t0 to point to the next top line in the next box
     addi $t1, $t1, 2 # increment the overall iterator to 2
@@ -245,7 +248,7 @@ left_empty:
     add $t7, $t7, $t1
     addi $t7, $t7, 16
     lb $t5, ($t7)
-    
+
     beq $t5, 32, right_empty # Check if right line of box is blank
     addi $t6, $t6, 1
     
@@ -255,22 +258,24 @@ right_empty:
     add $t7, $t7, $t1
     addi $t7, $t7, 30
     lb $t5, ($t7)
-    
+ 
     beq $t5, 32, down_empty # Check if left line of box is blank
     addi $t6, $t6, 1
 
 down_empty:
-
-    beq $t6, 3 success # Checks if the inputs placement will make a box
+    bge $t6, 4 success # Checks if the inputs placement will make a box
     j failure
 
 success:
-    
+    # problem here
+    #addi $s3, $s3, 1
     li $v0, 4
     la $a0, reward
     syscall
+    j exit
  
 failure:   
     # Return to main
-    j exit
+    j failed # go back to inner loop
+	
 	
